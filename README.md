@@ -1,4 +1,4 @@
-# 购买邀请码
+# 购买邀请码 - Buy Doorman
 
 ![License](https://img.shields.io/badge/license-GPL-3.0-only-blue.svg) [![Latest Stable Version](https://img.shields.io/packagist/v/imdong/flarum-ext-buy-doorman.svg)](https://packagist.org/packages/imdong/flarum-ext-buy-doorman) [![Total Downloads](https://img.shields.io/packagist/dt/imdong/flarum-ext-buy-doorman.svg)](https://packagist.org/packages/imdong/flarum-ext-buy-doorman)
 

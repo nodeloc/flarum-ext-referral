@@ -30,10 +30,10 @@ return [
 
     // 后端 添加接口
     (new Extend\Routes('api'))
-        ->post('/store/buy', 'imdong.buy-doorman.store.create', Api\Controller\CreateBuyDoormanRecordController::class),
+        ->post('/store/buy-doorman', 'imdong.store.buy-doorman.create', Api\Controller\CreateBuyDoormanRecordController::class),
 
     // 权限 是不是可以不需要
     (new Extend\Policy())
-        ->modelPolicy(BuyDoormanRecord::class, Access\BuyDoormanRecordPolicy::class)
+        ->modelPolicy(BuyDoormanRecord::class, Access\BuyDoormanRecordPolicy::class),
 
 ];

@@ -50,13 +50,16 @@ class BuyDoormanRecordRepository
     /**
      * @var int 邀请码价格
      */
-    protected $doormanPrice = 1000;
+    protected $doormanPrice = 100;
 
     /**
      * @var int[] 购买余额限制 (购买前大于该余额的，购买后也不应该小于该值)
      */
     protected $moneyBalanceLimits = [
-        300, 500, 2000
+//        50, // 软盘
+//        100, // U 盘
+        300, // 硬盘
+        1200, // 阵列
     ];
 
     /**
@@ -108,6 +111,15 @@ class BuyDoormanRecordRepository
      */
     private function checkBuyMoney(int $money): bool
     {
+        // 先排序
+        sort($this->moneyBalanceLimits);
+
+        // 但也不能低于最小值
+        if ($money < $this->moneyBalanceLimits[0]) {
+            throw new PermissionDeniedException('不满足购买要求（药丸大于300）');
+        }
+
+
         foreach ($this->moneyBalanceLimits as $balanceLimit) {
             if ($money > $balanceLimit && ($money - $this->doormanPrice) < $balanceLimit) {
                 throw new PermissionDeniedException('购买后余额不足');

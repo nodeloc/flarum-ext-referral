@@ -24,6 +24,7 @@ export default class SendDoormanEmail extends Modal {
     return (
       <div className="container buy-store-layer">
         <div className="Form">
+          <div class="helpText">将花费 100 药丸，购买一个注册邀请码，并发送到“受邀人邮箱”中。</div>
           <div class="Form-group">
             <label for="buy-store-to-mail">受邀人邮箱</label>
             <div class="helpText">邀请码购买成功后，将通过邮件发送到受邀人邮箱中。</div>
@@ -48,7 +49,7 @@ export default class SendDoormanEmail extends Modal {
 
     app.request({
       method: 'POST',
-      url: app.forum.attribute('apiUrl') + '/store/buy',
+      url: app.forum.attribute('apiUrl') + '/store/buy-doorman',
       body: {
         email: this.email(),
       }

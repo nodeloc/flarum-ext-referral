@@ -23,17 +23,17 @@ export default class StoreIndex<CustomAttrs extends IIndexPageAttrs = IIndexPage
             <nav className="IndexPage-nav sideNav">
               <ul>{listItems(this.sidebarItems().toArray())}</ul>
             </nav>
-            <div className="IndexPage-results sideNavOffset">
+            <div className="StorePage-results sideNavOffset">
               <h2 class="BadgeOverviewTitle">小药店</h2>
-              <Button className={"Button Button--primary"} onclick={() => {
-                app.modal.show(SendDoormanEmail)
-              }}>购买邀请码</Button>
+              <div className="Store-Body">
+                <Button className={"Button Button--primary"} onclick={() => {
+                  app.modal.show(SendDoormanEmail)
+                }}>购买邀请码</Button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     )
   }
-
-
 }

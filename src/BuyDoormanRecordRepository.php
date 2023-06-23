@@ -218,7 +218,7 @@ class BuyDoormanRecordRepository
         $record->save();
 
         // 发送邀请码到收件人邮箱
-//        $this->sendInvites($data['email'], $key);
+        $this->sendInvites($data['email'], $key);
 
         // 还是返回购买记录比较好
         return $record;

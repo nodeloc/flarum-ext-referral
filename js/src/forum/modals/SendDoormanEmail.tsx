@@ -9,7 +9,7 @@ export default class SendDoormanEmail extends Modal {
   constructor() {
     super();
 
-    this.email = Stream('t@c.cc');
+    this.email = Stream();
   }
 
   className() {
@@ -69,8 +69,10 @@ export default class SendDoormanEmail extends Modal {
       this.hide()
 
       // 刷新用户余额(爱咋咋地 红就红吧 能跑就行)
+      let money = app.session.user.attribute('money');
+      console.log('money', money, result);
       app.session.user.pushAttributes({
-        money: app.session.user.attributes('money') - result.data.attributes.money,
+        money: money - result.data.attributes.use_money,
       })
     });
   }

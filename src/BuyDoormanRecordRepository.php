@@ -145,7 +145,7 @@ class BuyDoormanRecordRepository
             base_convert($user_id, 10, 16),    // 用户 ID 5 位数应该够用了
             bin2hex(random_bytes(2)), // 后随机数
         );
-        return base_convert($rand_str, 16, 36);
+        return strtoupper(base_convert($rand_str, 16, 36));
     }
 
     /**

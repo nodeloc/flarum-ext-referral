@@ -35,7 +35,7 @@ export default class SendDoormanEmail extends Modal {
           <div class="Form-group">
             <label htmlFor="buy-store-to-mail">留言</label>
             <div class="helpText">留言将与邀请码邮件一同送与收件人。</div>
-            <input required id="buy-store-to-message" class="FormControl" type="text" bidi={this.message}/>
+            <input id="buy-store-to-message" class="FormControl" type="text" bidi={this.message}/>
           </div>
           {Button.component(
             {
@@ -62,22 +62,22 @@ export default class SendDoormanEmail extends Modal {
         message: this.message(),
       }
     }).then(result => {
-      console.log('result', result, result.data.attributes.error)
+      console.log('result', result)
 
       // 关闭加载中状态
       this.loading = false
 
       // 是有否错误
-      if (result.data.attributes.error) {
+      if (result.error) {
         app.alerts.show({
           type: "error",
-        }, result.data.attributes.error);
+        }, result.error);
         return;
       }
 
       app.alerts.show({
         type: "success",
-      }, '发送成功1');
+      }, '发送成功');
 
       // 清空邮箱
       this.email('')

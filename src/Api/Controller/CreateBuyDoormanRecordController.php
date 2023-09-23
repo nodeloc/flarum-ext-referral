@@ -3,7 +3,9 @@
 namespace ImDong\BuyDoorman\Api\Controller;
 
 use Flarum\Api\Controller\AbstractCreateController;
+use Flarum\Foundation\ErrorHandling\HandledError;
 use Flarum\Http\RequestUtil;
+use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Contracts\Bus\Dispatcher;
 use ImDong\BuyDoorman\BuyDoormanRecordRepository;
 use PHPUnit\Exception;
@@ -45,8 +47,14 @@ class CreateBuyDoormanRecordController extends AbstractCreateController
         $data = $request->getParsedBody();
 
         // 调用邀请码创建
-
+        try {
             return $this->repository->store($actor, $data);
+        } catch (\Exception|PermissionDeniedException $e) {
+            header('Content-Type:  application/json; charset=UTF-8');
+            die(json_encode([
+                'error' => $e->getMessage(),
+            ]));
+        }
 
     }
 }

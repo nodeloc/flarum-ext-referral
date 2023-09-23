@@ -103,6 +103,20 @@ class BuyDoormanRecordRepository
     }
 
     /**
+     * 判断是否在搞活动
+     *
+     * @return bool
+     */
+    public function isInPromotionPeriod(): bool
+    {
+        $start = strtotime('2023-09-29 00:00:00');
+        $end = strtotime('2023-10-03 23:59:59');
+        $now = time();
+
+        return $now >= $start && $now <= $end;
+    }
+
+    /**
      * 检查购买余额限制
      *
      * @param int $money
@@ -111,6 +125,12 @@ class BuyDoormanRecordRepository
      */
     private function checkBuyMoney(int $money): bool
     {
+        // 促销价格
+        if($this->isInPromotionPeriod()) {
+            $this->moneyBalanceLimits = [1];
+            $this->doormanPrice = 1;
+        }
+
         // 先排序
         sort($this->moneyBalanceLimits);
 
@@ -119,7 +139,7 @@ class BuyDoormanRecordRepository
             throw new PermissionDeniedException('不满足购买要求（药丸大于300）');
         }
 
-
+        // 试图扣钱
         foreach ($this->moneyBalanceLimits as $balanceLimit) {
             if ($money > $balanceLimit && ($money - $this->doormanPrice) < $balanceLimit) {
                 throw new PermissionDeniedException('购买后余额不足');
@@ -155,16 +175,31 @@ class BuyDoormanRecordRepository
      * @param string $doorkey
      * @return void
      */
-    private function sendInvites(string $email, string $doorkey, string $message)
+    private function sendInvites(string $email, string $doorkey, string $message, string $username)
     {
         $title = $this->settings->get('forum_title');
         $subject = $this->settings->get('forum_title') . ' - ' . $this->translator->trans('fof-doorman.forum.email.subject');
-        $body = $this->translator->trans('fof-doorman.forum.email.body', [
-            '{forum}' => $title,
-            '{url}' => $this->extensions->isEnabled('zerosonesfun-direct-links') ? $this->url->to('forum')->route('direct-links-signup') : $this->url->to('forum')->base(),
-            '{code}' => $doorkey,
-            '{message}' => $message,
-        ]);
+
+        // 如果有赠言就添加增加到邀请码后面
+        if (!empty($message)) {
+            $message = "\n以下是该用户发送邀请时留下的附言：\n\n{$message}\n";
+        }
+
+        $url = $this->extensions->isEnabled('zerosonesfun-direct-links')
+            ? $this->url->to('forum')->route('direct-links-signup')
+            : $this->url->to('forum')->base();
+
+        // 模板
+        $body = <<<ENO
+您好，来自 {$title} 的用户 {$username} 向您发送了一个注册邀请。
+{$message}
+如果您确认需要注册账户的话, 请点击下方连接并在注册时输入邀请码即可。
+
+网址：{$url}
+邀请码：{$doorkey}
+
+如果您错误地收到了这封邮件，请忽略邮件内容。
+ENO;
 
         $this->mailer->raw(
             $body,
@@ -187,9 +222,19 @@ class BuyDoormanRecordRepository
     {
         $this->validator->assertValid($data);
 
+        // 是否已经发送或已注册
         if ($this->checkEmail($data['email'])) {
-            $e = new ("该邮箱已注册或最近收到过邀请码", 401);
-            throw $e;
+            throw new \Exception("该邮箱已注册或最近收到过邀请码", 401);
+        }
+
+        // 如果活动期间 检查条件不一样
+        if ($this->isInPromotionPeriod()) {
+            // 检查用户组
+            $groups = $actor->groups()->select(['id', 'name_singular'])->get()->toArray();
+            $groups = array_column($groups, 'name_singular', 'id');
+            if (!isset($groups[18])) {
+                throw new \Exception("你所在的用户组暂不允许发药", 401);
+            }
         }
 
         // 检查用户余额是否符合要求
@@ -200,7 +245,7 @@ class BuyDoormanRecordRepository
         $lock_file = sprintf('%s/flarum-money-%s.lock', sys_get_temp_dir(), $actor->id);
         $fd = fopen($lock_file, 'w+');
         if (!flock($fd, LOCK_EX)) {
-            throw new \Exception();
+            throw new \Exception("发送失败");
         }
 
         // 扣减金额
@@ -223,8 +268,11 @@ class BuyDoormanRecordRepository
         $actor->save();
         $record->save();
 
+        // 获取昵称
+        $nickname = $actor->getAttribute('nickname') ?: $actor->getAttribute('username');
+
         // 发送邀请码到收件人邮箱
-        $this->sendInvites($data['email'], $key, $data['message'] ?? '');
+        $this->sendInvites($data['email'], $key, $data['message'] ?? '', $nickname);
 
         // 还是返回购买记录比较好
         return $record;

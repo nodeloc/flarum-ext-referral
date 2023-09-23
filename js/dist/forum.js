@@ -142,7 +142,6 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
     }, "\u7559\u8A00"), m("div", {
       "class": "helpText"
     }, "\u7559\u8A00\u5C06\u4E0E\u9080\u8BF7\u7801\u90AE\u4EF6\u4E00\u540C\u9001\u4E0E\u6536\u4EF6\u4EBA\u3002"), m("input", {
-      required: true,
       id: "buy-store-to-message",
       "class": "FormControl",
       type: "text",
@@ -165,21 +164,21 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
         message: this.message()
       }
     }).then(function (result) {
-      console.log('result', result, result.data.attributes.error);
+      console.log('result', result);
 
       // 关闭加载中状态
       _this2.loading = false;
 
       // 是有否错误
-      if (result.data.attributes.error) {
+      if (result.error) {
         flarum_forum_app__WEBPACK_IMPORTED_MODULE_1___default().alerts.show({
           type: "error"
-        }, result.data.attributes.error);
+        }, result.error);
         return;
       }
       flarum_forum_app__WEBPACK_IMPORTED_MODULE_1___default().alerts.show({
         type: "success"
-      }, '发送成功1');
+      }, '发送成功');
 
       // 清空邮箱
       _this2.email('');

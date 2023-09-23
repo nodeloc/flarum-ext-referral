@@ -110,6 +110,13 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
     return _this;
   }
   var _proto = SendDoormanEmail.prototype;
+  _proto.money = function money() {
+    // 判断时间
+    var start = new Date('2023-09-29 00:00:00'),
+      end = new Date('2023-10-03 23:59:59'),
+      now = new Date();
+    return now > start && start <= end ? 1 : 100;
+  };
   _proto.className = function className() {
     return 'store-buy Modal--small';
   };
@@ -123,7 +130,7 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
       className: "Form"
     }, m("div", {
       "class": "helpText"
-    }, "\u5C06\u82B1\u8D39 100 \u836F\u4E38\uFF0C\u8D2D\u4E70\u4E00\u4E2A\u6CE8\u518C\u9080\u8BF7\u7801\uFF0C\u5E76\u53D1\u9001\u5230\u201C\u53D7\u9080\u4EBA\u90AE\u7BB1\u201D\u4E2D\u3002"), m("div", {
+    }, "\u5C06\u82B1\u8D39 ", this.money(), " \u836F\u4E38\uFF0C\u8D2D\u4E70\u4E00\u4E2A\u6CE8\u518C\u9080\u8BF7\u7801\uFF0C\u5E76\u53D1\u9001\u5230\u201C\u53D7\u9080\u4EBA\u90AE\u7BB1\u201D\u4E2D\u3002"), m("div", {
       "class": "Form-group"
     }, m("label", {
       "for": "buy-store-to-mail"
@@ -141,7 +148,7 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
       htmlFor: "buy-store-to-mail"
     }, "\u7559\u8A00"), m("div", {
       "class": "helpText"
-    }, "\u7559\u8A00\u5C06\u4E0E\u9080\u8BF7\u7801\u90AE\u4EF6\u4E00\u540C\u9001\u4E0E\u6536\u4EF6\u4EBA\u3002"), m("input", {
+    }, "\u7559\u8A00\u5C06\u4E0E\u9080\u8BF7\u7801\u90AE\u4EF6\u4E00\u540C\u9001\u4E0E\u6536\u4EF6\u4EBA(\u53EF\u7A7A)\u3002"), m("input", {
       id: "buy-store-to-message",
       "class": "FormControl",
       type: "text",

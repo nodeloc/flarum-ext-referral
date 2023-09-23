@@ -14,6 +14,15 @@ export default class SendDoormanEmail extends Modal {
     this.message = Stream();
   }
 
+  money() {
+    // 判断时间
+    let start = new Date('2023-09-29 00:00:00'),
+        end = new Date('2023-10-03 23:59:59'),
+        now = new Date();
+
+    return now > start && start <=end ? 1 : 100
+  }
+
   className() {
     return 'store-buy Modal--small';
   }
@@ -26,7 +35,7 @@ export default class SendDoormanEmail extends Modal {
     return (
       <div className="container buy-store-layer">
         <div className="Form">
-          <div class="helpText">将花费 100 药丸，购买一个注册邀请码，并发送到“受邀人邮箱”中。</div>
+          <div class="helpText">将花费 { this.money()} 药丸，购买一个注册邀请码，并发送到“受邀人邮箱”中。</div>
           <div class="Form-group">
             <label for="buy-store-to-mail">受邀人邮箱</label>
             <div class="helpText">邀请码购买成功后，将通过邮件发送到受邀人邮箱中。</div>
@@ -34,7 +43,7 @@ export default class SendDoormanEmail extends Modal {
           </div>
           <div class="Form-group">
             <label htmlFor="buy-store-to-mail">留言</label>
-            <div class="helpText">留言将与邀请码邮件一同送与收件人。</div>
+            <div class="helpText">留言将与邀请码邮件一同送与收件人(可空)。</div>
             <input id="buy-store-to-message" class="FormControl" type="text" bidi={this.message}/>
           </div>
           {Button.component(

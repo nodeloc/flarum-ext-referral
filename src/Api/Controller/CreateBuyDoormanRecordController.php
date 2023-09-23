@@ -6,6 +6,7 @@ use Flarum\Api\Controller\AbstractCreateController;
 use Flarum\Http\RequestUtil;
 use Illuminate\Contracts\Bus\Dispatcher;
 use ImDong\BuyDoorman\BuyDoormanRecordRepository;
+use PHPUnit\Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
 use ImDong\BuyDoorman\Api\Serializer\BuyDoormanRecordSerializer;
@@ -33,7 +34,6 @@ class CreateBuyDoormanRecordController extends AbstractCreateController
         $this->repository = $repository;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -45,6 +45,8 @@ class CreateBuyDoormanRecordController extends AbstractCreateController
         $data = $request->getParsedBody();
 
         // 调用邀请码创建
-        return $this->repository->store($actor, $data);
+
+            return $this->repository->store($actor, $data);
+
     }
 }

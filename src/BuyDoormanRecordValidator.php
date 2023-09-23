@@ -12,5 +12,6 @@ class BuyDoormanRecordValidator extends AbstractValidator
     protected $rules = [
         // See https://laravel.com/docs/8.x/validation#available-validation-rules for more information.
         'email' => 'required|email',
+        'message' => 'string',
     ];
 }

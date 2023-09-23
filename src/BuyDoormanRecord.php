@@ -12,6 +12,8 @@ class BuyDoormanRecord extends AbstractModel
 
     protected $table = 'buy_doorman_records';
 
+    public $timestamps = true;
+
     public $fillable = [
         'create_user_id',
         'money',

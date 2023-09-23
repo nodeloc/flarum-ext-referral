@@ -5,11 +5,13 @@ import Stream from 'flarum/common/utils/Stream';
 
 export default class SendDoormanEmail extends Modal {
   private email: Stream;
+  private message: Stream;
 
   constructor() {
     super();
 
     this.email = Stream();
+    this.message = Stream();
   }
 
   className() {
@@ -29,6 +31,11 @@ export default class SendDoormanEmail extends Modal {
             <label for="buy-store-to-mail">受邀人邮箱</label>
             <div class="helpText">邀请码购买成功后，将通过邮件发送到受邀人邮箱中。</div>
             <input required id="buy-store-to-mail" class="FormControl" type="email" bidi={this.email}/>
+          </div>
+          <div class="Form-group">
+            <label htmlFor="buy-store-to-mail">留言</label>
+            <div class="helpText">留言将与邀请码邮件一同送与收件人。</div>
+            <input required id="buy-store-to-message" class="FormControl" type="text" bidi={this.message}/>
           </div>
           {Button.component(
             {
@@ -52,18 +59,29 @@ export default class SendDoormanEmail extends Modal {
       url: app.forum.attribute('apiUrl') + '/store/buy-doorman',
       body: {
         email: this.email(),
+        message: this.message(),
       }
     }).then(result => {
-      console.log('result', result)
+      console.log('result', result, result.data.attributes.error)
 
       // 关闭加载中状态
       this.loading = false
+
+      // 是有否错误
+      if (result.data.attributes.error) {
+        app.alerts.show({
+          type: "error",
+        }, result.data.attributes.error);
+        return;
+      }
+
       app.alerts.show({
         type: "success",
-      }, '发送成功');
+      }, '发送成功1');
 
       // 清空邮箱
       this.email('')
+      this.message('')
 
       // 关闭购买框
       this.hide()

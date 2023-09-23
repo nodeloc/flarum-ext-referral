@@ -21,6 +21,13 @@ class BuyDoormanRecordSerializer extends AbstractSerializer
      */
     protected function getDefaultAttributes($model)
     {
+        // 如果是报错
+        if ($model instanceof \Exception) {
+           return  [
+                'error' => $model->getMessage()
+            ];
+        }
+
         if (! ($model instanceof BuyDoormanRecord)) {
             throw new InvalidArgumentException(
                 get_class($this).' can only serialize instances of '.BuyDoormanRecord::class

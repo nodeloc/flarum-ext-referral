@@ -155,7 +155,7 @@ class BuyDoormanRecordRepository
      * @param string $doorkey
      * @return void
      */
-    private function sendInvites(string $email, string $doorkey)
+    private function sendInvites(string $email, string $doorkey, string $message)
     {
         $title = $this->settings->get('forum_title');
         $subject = $this->settings->get('forum_title') . ' - ' . $this->translator->trans('fof-doorman.forum.email.subject');
@@ -163,6 +163,7 @@ class BuyDoormanRecordRepository
             '{forum}' => $title,
             '{url}' => $this->extensions->isEnabled('zerosonesfun-direct-links') ? $this->url->to('forum')->route('direct-links-signup') : $this->url->to('forum')->base(),
             '{code}' => $doorkey,
+            '{message}' => $message,
         ]);
 
         $this->mailer->raw(
@@ -185,6 +186,11 @@ class BuyDoormanRecordRepository
     public function store(User $actor, array $data): BuyDoormanRecord
     {
         $this->validator->assertValid($data);
+
+        if ($this->checkEmail($data['email'])) {
+            $e = new ("该邮箱已注册或最近收到过邀请码", 401);
+            throw $e;
+        }
 
         // 检查用户余额是否符合要求
         $money = $actor->getAttribute('money');
@@ -218,9 +224,21 @@ class BuyDoormanRecordRepository
         $record->save();
 
         // 发送邀请码到收件人邮箱
-        $this->sendInvites($data['email'], $key);
+        $this->sendInvites($data['email'], $key, $data['message'] ?? '');
 
         // 还是返回购买记录比较好
         return $record;
+    }
+
+    /**
+     * 检查一个邮箱是否发送过邀请码
+     */
+    public function checkEmail(string $email): bool
+    {
+        // 检查邮箱是否被注册
+        $user_exists = User::query()->select('email')->where('email', $email);
+        $record_exists = BuyDoormanRecord::query()->select('recipient')->where('recipient', $email);
+
+        return $user_exists->union($record_exists)->exists();
     }
 }

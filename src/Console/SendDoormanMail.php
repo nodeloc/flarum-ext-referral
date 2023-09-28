@@ -17,7 +17,7 @@ class SendDoormanMail extends AbstractCommand
     /**
      * @var int 发送邮件休息间隔时间 单位秒
      */
-    private $send_sleep = 30;
+    private $send_sleep = 5;
 
     /**
      * @var int 发送多少个停止
@@ -86,11 +86,23 @@ class SendDoormanMail extends AbstractCommand
             // 发送记录
             $this->info(sprintf('send %s to %s from %s message %s', $data['key'], $data['email'], $data['nickname'], $data['message']));
 
-            // 发送邮件
-            $obj->sendInvites($data['email'], $data['key'], $data['message'], $data['nickname']);
+            try {
+                // 发送邮件
+                $obj->sendInvites($data['email'], $data['key'], $data['message'], $data['nickname']);
 
-            // 删除缓存文件
-            unlink($file);
+                // 删除缓存文件
+                unlink($file);
+            } catch (\Exception $e) {
+                $this->error(trim($e->getMessage()));
+
+                // 失败记下来
+                if(++$data['retry'] < 3) {
+                    file_put_contents($file, json_encode($data));
+                } else {
+                    // 失败多次就放弃
+                    rename($file, $file . '.err');
+                }
+            }
 
             // 次数到了没？
             if (++$i >= $this->send_max) {

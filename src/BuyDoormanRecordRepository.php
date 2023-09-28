@@ -267,7 +267,7 @@ ENO;
             'money' => $this->doormanPrice,
             'doorman_key' => $key,
             'recipient' => $data['email'],
-            'message' => $data['message'],
+            'message' => $data['message'] ?? '',
         ]);
 
         // 保存就是了
@@ -299,7 +299,16 @@ ENO;
      */
     public function getCacheFile(string $doorman = '*'): string
     {
-        return sprintf($this->cache_file, resolve(Paths::class)->storage, $doorman);
+        $time = time();
+        if($doorman == '*') {
+            $time = '*';
+        }
+
+        return sprintf(
+            $this->cache_file,
+            resolve(Paths::class)->storage,
+            $time . '-' . $doorman
+        );
     }
 
     /**

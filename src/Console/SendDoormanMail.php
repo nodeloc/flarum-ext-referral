@@ -17,7 +17,12 @@ class SendDoormanMail extends AbstractCommand
     /**
      * @var int 发送邮件休息间隔时间 单位秒
      */
-    private $send_sleep = 5;
+    private $send_sleep = 30;
+
+    /**
+     * @var int 发送多少个停止
+     */
+    private $send_max = 2;
 
     protected function configure()
     {
@@ -87,11 +92,14 @@ class SendDoormanMail extends AbstractCommand
             // 删除缓存文件
             unlink($file);
 
+            // 次数到了没？
+            if (++$i >= $this->send_max) {
+                $this->info("rest");
+                break;
+            }
+
             // 休息几秒
             sleep($this->send_sleep);
         }
-
-
-        var_dump($files);
     }
 }

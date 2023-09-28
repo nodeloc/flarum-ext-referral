@@ -12,17 +12,18 @@
 namespace ImDong\BuyDoorman;
 
 use Flarum\Extend;
+use Illuminate\Console\Scheduling\Event;
 
 return [
     (new Extend\Frontend('forum'))
-        ->js(__DIR__.'/js/dist/forum.js')
-        ->css(__DIR__.'/less/forum.less'),
+        ->js(__DIR__ . '/js/dist/forum.js')
+        ->css(__DIR__ . '/less/forum.less'),
 
     (new Extend\Frontend('admin'))
-        ->js(__DIR__.'/js/dist/admin.js')
-        ->css(__DIR__.'/less/admin.less'),
+        ->js(__DIR__ . '/js/dist/admin.js')
+        ->css(__DIR__ . '/less/admin.less'),
 
-    new Extend\Locales(__DIR__.'/locale'),
+    new Extend\Locales(__DIR__ . '/locale'),
 
     // 前端 添加页面路由
     (new Extend\Frontend('forum'))
@@ -36,6 +37,9 @@ return [
     (new Extend\Policy())
         ->modelPolicy(BuyDoormanRecord::class, Access\BuyDoormanRecordPolicy::class),
     (new Extend\Console())
-        ->command(Console\SendDoormanMail::class),
+        ->command(Console\SendDoormanMail::class)
+        ->schedule('doorman:sendMail', function (Event $event) {
+            $event->everyMinute();
+        }),
 
 ];

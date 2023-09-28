@@ -19,5 +19,6 @@ class BuyDoormanRecord extends AbstractModel
         'money',
         'doorman_key',
         'recipient',
+        'message',
     ];
 }

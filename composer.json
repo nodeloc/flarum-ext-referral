@@ -8,7 +8,9 @@
     "license": "GPL-3.0-only",
     "require": {
         "flarum/core": "^1.2.0",
-        "fof/doorman": "^1.1"
+        "fof/doorman": "^1.1",
+      "ext-json": "*",
+        "antoinefr/flarum-ext-money": "^1.3"
     },
     "authors": [
         {

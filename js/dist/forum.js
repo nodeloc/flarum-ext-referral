@@ -185,7 +185,7 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
       }
       flarum_forum_app__WEBPACK_IMPORTED_MODULE_1___default().alerts.show({
         type: "success"
-      }, '发送成功');
+      }, '邀请邮件已加入发送队列，若超过一小时未收到请联系管理员。');
 
       // 清空邮箱
       _this2.email('');

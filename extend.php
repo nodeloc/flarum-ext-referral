@@ -35,5 +35,7 @@ return [
     // 权限 是不是可以不需要
     (new Extend\Policy())
         ->modelPolicy(BuyDoormanRecord::class, Access\BuyDoormanRecordPolicy::class),
+    (new Extend\Console())
+        ->command(Console\SendDoormanMail::class),
 
 ];

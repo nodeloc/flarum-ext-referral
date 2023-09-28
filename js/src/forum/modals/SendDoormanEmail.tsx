@@ -86,7 +86,7 @@ export default class SendDoormanEmail extends Modal {
 
       app.alerts.show({
         type: "success",
-      }, '发送成功');
+      }, '邀请邮件已加入发送队列，若超过一小时未收到请联系管理员。');
 
       // 清空邮箱
       this.email('')

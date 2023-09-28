@@ -2,6 +2,7 @@
 
 namespace ImDong\BuyDoorman;
 
+use Flarum\Foundation\Paths;
 use Flarum\User\Exception\PermissionDeniedException;
 use Flarum\User\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -61,6 +62,11 @@ class BuyDoormanRecordRepository
         300, // 硬盘
         1200, // 阵列
     ];
+
+    /**
+     * @var string 锁文件位置
+     */
+    private $cache_file = '%s//cache/send-doorman-mail-%s.json';
 
     /**
      * @var int 注册用户默认用户组
@@ -126,7 +132,7 @@ class BuyDoormanRecordRepository
     private function checkBuyMoney(int $money): bool
     {
         // 促销价格
-        if($this->isInPromotionPeriod()) {
+        if ($this->isInPromotionPeriod()) {
             $this->moneyBalanceLimits = [1];
             $this->doormanPrice = 1;
         }
@@ -175,7 +181,7 @@ class BuyDoormanRecordRepository
      * @param string $doorkey
      * @return void
      */
-    private function sendInvites(string $email, string $doorkey, string $message, string $username)
+    public function sendInvites(string $email, string $doorkey, string $message, string $username)
     {
         $title = $this->settings->get('forum_title');
         $subject = $this->settings->get('forum_title') . ' - ' . $this->translator->trans('fof-doorman.forum.email.subject');
@@ -261,6 +267,7 @@ ENO;
             'money' => $this->doormanPrice,
             'doorman_key' => $key,
             'recipient' => $data['email'],
+            'message' => $data['message'],
         ]);
 
         // 保存就是了
@@ -272,10 +279,27 @@ ENO;
         $nickname = $actor->getAttribute('nickname') ?: $actor->getAttribute('username');
 
         // 发送邀请码到收件人邮箱
-        $this->sendInvites($data['email'], $key, $data['message'] ?? '', $nickname);
+//        $this->sendInvites($data['email'], $key, $data['message'] ?? '', $nickname);
+
+        // 保存到队列
+        file_put_contents($this->getCacheFile($key), json_encode([
+            'email' => $data['email'],
+            'key' => $key,
+            'message' => $data['message'] ?? '',
+            'nickname' => $nickname,
+            'retry' => 0,
+        ]));
 
         // 还是返回购买记录比较好
         return $record;
+    }
+
+    /**
+     * @return string 获取锁定文件位置
+     */
+    public function getCacheFile(string $doorman = '*'): string
+    {
+        return sprintf($this->cache_file, resolve(Paths::class)->storage, $doorman);
     }
 
     /**

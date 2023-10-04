@@ -20,5 +20,7 @@ class BuyDoormanRecord extends AbstractModel
         'doorman_key',
         'recipient',
         'message',
+        'retry',
+        'error',
     ];
 }

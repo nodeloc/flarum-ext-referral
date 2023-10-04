@@ -51,7 +51,7 @@ class BuyDoormanRecordRepository
     /**
      * @var int 邀请码价格
      */
-    protected $doormanPrice = 100;
+    protected $doormanPrice = 260;
 
     /**
      * @var int[] 购买余额限制 (购买前大于该余额的，购买后也不应该小于该值)
@@ -115,8 +115,9 @@ class BuyDoormanRecordRepository
      */
     public function isInPromotionPeriod(): bool
     {
-        $start = strtotime('2023-09-29 00:00:00');
-        $end = strtotime('2023-10-03 23:59:59');
+        // TODO 时区问题
+        $start = 1695916800;
+        $end = 1696348800;
         $now = time();
 
         return $now >= $start && $now <= $end;
@@ -202,6 +203,7 @@ class BuyDoormanRecordRepository
 如果您确认需要注册账户的话, 请点击下方连接并在注册时输入邀请码即可。
 
 网址：{$url}
+
 邀请码：{$doorkey}
 
 如果您错误地收到了这封邮件，请忽略邮件内容。
@@ -238,7 +240,7 @@ ENO;
             // 检查用户组
             $groups = $actor->groups()->select(['id', 'name_singular'])->get()->toArray();
             $groups = array_column($groups, 'name_singular', 'id');
-            if (!isset($groups[18])) {
+            if (!isset($groups[18]) && !isset($groups[23]) && !isset($groups[24])) {
                 throw new \Exception("你所在的用户组暂不允许发药", 401);
             }
         }
@@ -268,6 +270,7 @@ ENO;
             'doorman_key' => $key,
             'recipient' => $data['email'],
             'message' => $data['message'] ?? '',
+            'retry' => 3, // 可以重试的次数
         ]);
 
         // 保存就是了
@@ -276,19 +279,19 @@ ENO;
         $record->save();
 
         // 获取昵称
-        $nickname = $actor->getAttribute('nickname') ?: $actor->getAttribute('username');
+//        $nickname = $actor->getAttribute('nickname') ?: $actor->getAttribute('username');
 
         // 发送邀请码到收件人邮箱
 //        $this->sendInvites($data['email'], $key, $data['message'] ?? '', $nickname);
 
         // 保存到队列
-        file_put_contents($this->getCacheFile($key), json_encode([
-            'email' => $data['email'],
-            'key' => $key,
-            'message' => $data['message'] ?? '',
-            'nickname' => $nickname,
-            'retry' => 0,
-        ]));
+//        file_put_contents($this->getCacheFile($key), json_encode([
+//            'email' => $data['email'],
+//            'key' => $key,
+//            'message' => $data['message'] ?? '',
+//            'nickname' => $nickname,
+//            'retry' => 0,
+//        ]));
 
         // 还是返回购买记录比较好
         return $record;

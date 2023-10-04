@@ -115,7 +115,7 @@ var SendDoormanEmail = /*#__PURE__*/function (_Modal) {
     var start = new Date('2023-09-29 00:00:00'),
       end = new Date('2023-10-03 23:59:59'),
       now = new Date();
-    return now > start && start <= end ? 1 : 100;
+    return now >= start && now <= end ? 1 : 260;
   };
   _proto.className = function className() {
     return 'store-buy Modal--small';

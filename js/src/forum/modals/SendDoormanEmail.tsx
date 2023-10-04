@@ -20,7 +20,7 @@ export default class SendDoormanEmail extends Modal {
         end = new Date('2023-10-03 23:59:59'),
         now = new Date();
 
-    return now > start && start <=end ? 1 : 100
+    return now >= start && now <= end ? 1 : 260;
   }
 
   className() {
@@ -35,7 +35,7 @@ export default class SendDoormanEmail extends Modal {
     return (
       <div className="container buy-store-layer">
         <div className="Form">
-          <div class="helpText">将花费 { this.money()} 药丸，购买一个注册邀请码，并发送到“受邀人邮箱”中。</div>
+          <div class="helpText">将花费 {this.money()} 药丸，购买一个注册邀请码，并发送到“受邀人邮箱”中。</div>
           <div class="Form-group">
             <label for="buy-store-to-mail">受邀人邮箱</label>
             <div class="helpText">邀请码购买成功后，将通过邮件发送到受邀人邮箱中。</div>

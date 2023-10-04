@@ -4,8 +4,9 @@ namespace ImDong\BuyDoorman\Console;
 
 use Flarum\Console\AbstractCommand;
 use Flarum\Foundation\Paths;
+use Flarum\User\User;
+use ImDong\BuyDoorman\BuyDoormanRecord;
 use ImDong\BuyDoorman\BuyDoormanRecordRepository;
-use Symfony\Component\Filesystem\Path;
 
 class SendDoormanMail extends AbstractCommand
 {
@@ -70,45 +71,58 @@ class SendDoormanMail extends AbstractCommand
         // 获取对象
         $obj = resolve(BuyDoormanRecordRepository::class);
 
-        // 获取待发送文件列表
-        $dir = $obj->getCacheFile();
-        $files = glob($dir);
+        // 从数据库获取待发送记录
+        $user_table = (new User)->getTable();
+        $records = BuyDoormanRecord::query()
+            ->leftJoin($user_table, 'create_user_id', '=', "$user_table.id")
+            ->select([
+                "$user_table.username",// "$user_table.nickname",
+                (new BuyDoormanRecord)->getTable() .'.id', 'doorman_key', 'recipient', 'message', 'retry'
+            ])
+            ->where('retry', '>', 0)
+            ->orderBy('created_at')
+            ->limit($this->send_max)
+            ->get();
 
         /**
          * 发送
          */
-        $i = 0;
-
-        foreach ($files as $file) {
-            // 读取文件
-            $data = json_decode(file_get_contents($file), true);
-
+        foreach ($records as $record) {
+            $nickname = $record->nickname ?? $record->username;
             // 发送记录
-            $this->info(sprintf('send %s to %s from %s message %s', $data['key'], $data['email'], $data['nickname'], $data['message']));
+            $this->info(sprintf('send %s to %s from %s message %s', $record->doorman_key, $record->recipient, $nickname, $record->message));
 
             try {
                 // 发送邮件
-                $obj->sendInvites($data['email'], $data['key'], $data['message'], $data['nickname']);
+                $obj->sendInvites(
+                    $record->recipient,
+                    $record->doorman_key,
+                    $record->message,
+                    $nickname
+                );
 
-                // 删除缓存文件
-                unlink($file);
+                // 更新为已经发送
+                $update = [
+                    'retry' => -1
+                ];
+//                $record->retry = -1;
             } catch (\Exception $e) {
                 $this->error(trim($e->getMessage()));
 
-                // 失败记下来
-                if(++$data['retry'] < 3) {
-                    file_put_contents($file, json_encode($data));
-                } else {
-                    // 失败多次就放弃
-                    rename($file, $file . '.err');
-                }
+                // 更新失败次数
+                $update = [
+                    'retry' => $record->retry - 1,
+                    'error' => trim($e->getMessage())
+                ];
+//                $record->retry = $record->retry - 1;
+//                $record->error = trim($e->getMessage());
+
             }
 
-            // 次数到了没？
-            if (++$i >= $this->send_max) {
-                $this->info("rest");
-                break;
-            }
+            // 更新到数据库
+            $res = BuyDoormanRecord::query()
+                ->where('doorman_key', $record->doorman_key)
+                ->update($update);
 
             // 休息几秒
             sleep($this->send_sleep);

@@ -16,9 +16,10 @@
     "declarationDir": "./dist-typings",
     "baseUrl": ".",
     "paths": {
-      "flarum/*": ["../vendor/flarum/core/js/dist-typings/*"],
+      "flarum/*": ["../vendor/flarum/core/js/dist-typings/*"]
 // <CUSTOM-2>
 // </CUSTOM-2>
-    }
+    },
+    "jsx": "react"
   }
 }

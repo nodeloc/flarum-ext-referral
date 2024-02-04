@@ -6,9 +6,9 @@ export {default as extend} from './extend';
 
 extend(IndexPage.prototype, 'navItems', function (items) {
   items.add(
-    'buy-doorman-store',
-    <LinkButton href={app.route('imdong.buy-doorman.store.index')} icon="fas fa-store">
-      小药店
+    'referral-store',
+    <LinkButton href={app.route('nodeloc.referral.store.index')} icon="fas fa-share-alt">
+        {app.translator.trans('nodeloc-referral.forum.referral')}
     </LinkButton>,
     0
   );

@@ -3,5 +3,5 @@ import StoreIndex from "./pages/StoreIndex";
 
 export default [
   new Extend.Routes()
-    .add('imdong.buy-doorman.store.index', '/store', StoreIndex),
+    .add('nodeloc.referral.store.index', '/store', StoreIndex),
 ];

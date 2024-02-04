@@ -1,10 +1,10 @@
 <?php
 
-namespace ImDong\BuyDoorman\Command;
+namespace Nodeloc\Referral\Command;
 
 use Flarum\User\User;
 
-class CreateBuyDoormanRecord
+class CreateReferralRecord
 {
     /**
      * @var \Flarum\User\User

@@ -1,5 +1,5 @@
 {
-    "name": "@imdong/flarum-ext-buy-doorman",
+    "name": "@nodeloc/flarum-ext-referral",
     "private": true,
     "version": "0.0.0",
     "devDependencies": {

@@ -1,17 +1,16 @@
 <?php
 
-namespace ImDong\BuyDoorman;
+namespace Nodeloc\Referral;
 
 use Flarum\Foundation\AbstractValidator;
 
-class BuyDoormanRecordValidator extends AbstractValidator
+class ReferralRecordValidator extends AbstractValidator
 {
     /**
      * {@inheritdoc}
      */
     protected $rules = [
         // See https://laravel.com/docs/8.x/validation#available-validation-rules for more information.
-        'email' => 'required|email',
-        'message' => 'string',
+        'key_count' => 'required',
     ];
 }

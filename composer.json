@@ -1,6 +1,6 @@
 {
-    "name": "imdong/flarum-ext-buy-doorman",
-    "description": "购买邀请码",
+    "name": "nodeloc/flarum-ext-referral",
+    "description": "Referral system",
     "keywords": [
         "flarum"
     ],
@@ -8,30 +8,30 @@
     "license": "GPL-3.0-only",
     "require": {
         "flarum/core": "^1.2.0",
-        "fof/doorman": "^1.1",
-      "ext-json": "*",
+        "fof/doorman": "*",
+        "ext-json": "*",
         "antoinefr/flarum-ext-money": "^1.3"
     },
     "authors": [
         {
-            "name": "ImDong",
-            "email": "www@qs5.org",
+            "name": "Nodeloc",
+            "email": "james@nodeloc.com",
             "role": "Developer"
         }
     ],
     "autoload": {
         "psr-4": {
-            "ImDong\\BuyDoorman\\": "src/"
+            "Nodeloc\\Referral\\": "src/"
         }
     },
     "extra": {
         "flarum-extension": {
-            "title": "购买邀请码",
+            "title": "Referral",
             "category": "",
             "icon": {
-                "name": "",
-                "color": "",
-                "backgroundColor": ""
+                "name": "fas fa-share-alt",
+                "backgroundColor": "#99CC66",
+                "color": "#ccc"
             }
         },
         "flarum-cli": {
@@ -57,7 +57,7 @@
     "prefer-stable": true,
     "autoload-dev": {
         "psr-4": {
-            "ImDong\\BuyDoorman\\Tests\\": "tests/"
+            "Nodeloc\\Referral\\Tests\\": "tests/"
         }
     },
     "scripts": {

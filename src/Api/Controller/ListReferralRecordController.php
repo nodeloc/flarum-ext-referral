@@ -1,24 +1,23 @@
 <?php
 
-namespace ImDong\BuyDoorman\Api\Controller;
+namespace Nodeloc\Referral\Api\Controller;
 
 use Flarum\Api\Controller\AbstractCreateController;
-use Flarum\Foundation\ErrorHandling\HandledError;
 use Flarum\Http\RequestUtil;
 use Flarum\User\Exception\PermissionDeniedException;
 use Illuminate\Contracts\Bus\Dispatcher;
-use ImDong\BuyDoorman\BuyDoormanRecordRepository;
-use PHPUnit\Exception;
+use Nodeloc\Referral\ReferralRecord;
+use Nodeloc\Referral\ReferralRecordRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Tobscure\JsonApi\Document;
-use ImDong\BuyDoorman\Api\Serializer\BuyDoormanRecordSerializer;
+use Nodeloc\Referral\Api\Serializer\ReferralRecordSerializer;
 
-class CreateBuyDoormanRecordController extends AbstractCreateController
+class ListReferralRecordController extends AbstractCreateController
 {
     /**
      * {@inheritdoc}
      */
-    public $serializer = BuyDoormanRecordSerializer::class;
+    public $serializer = ReferralRecordSerializer::class;
 
     /**
      * @var Dispatcher
@@ -30,7 +29,7 @@ class CreateBuyDoormanRecordController extends AbstractCreateController
     /**
      * @param Dispatcher $bus
      */
-    public function __construct(Dispatcher $bus, BuyDoormanRecordRepository $repository)
+    public function __construct(Dispatcher $bus, ReferralRecordRepository $repository)
     {
         $this->bus = $bus;
         $this->repository = $repository;
@@ -39,22 +38,19 @@ class CreateBuyDoormanRecordController extends AbstractCreateController
     /**
      * {@inheritdoc}
      */
-    protected function data(ServerRequestInterface $request, Document $document)
+    public function data(ServerRequestInterface $request, Document $document)
     {
-        // See https://docs.flarum.org/extend/api.html#api-endpoints for more information.
-
         $actor = RequestUtil::getActor($request);
-        $data = $request->getParsedBody();
 
-        // 调用邀请码创建
         try {
-            return $this->repository->store($actor, $data);
+            $records = ReferralRecord::with('doorkey')->where('user_id', $actor->id)->orderBy('created_at', 'desc')->get();
+            return $records;
         } catch (\Exception|PermissionDeniedException $e) {
             header('Content-Type:  application/json; charset=UTF-8');
             die(json_encode([
                 'error' => $e->getMessage(),
             ]));
         }
-
     }
+
 }

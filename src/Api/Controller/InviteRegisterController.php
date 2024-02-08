@@ -12,6 +12,7 @@ use Exception;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Illuminate\Support\Arr;
 
 class InviteRegisterController implements RequestHandlerInterface
 {
@@ -31,11 +32,8 @@ class InviteRegisterController implements RequestHandlerInterface
     public function handle(Request $request): ResponseInterface
     {
         try {
-            // 输出请求的所有属性
-            $inviteKey = $request->getAttribute('doorkey');
-            echo 'doorkey value: ' . $request->getAttribute('doorkey');
 
-            // 这里你可以根据 inviteKey 做一些逻辑处理
+            $inviteKey = Arr::get($request->getQueryParams(), 'doorkey');
             // 返回注册页面
             return new HtmlResponse('Error: ' . $inviteKey, 500);
         } catch (Exception $e) {

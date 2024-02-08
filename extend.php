@@ -31,8 +31,9 @@ return [
 
     // 前端 添加页面路由
     (new Extend\Frontend('forum'))
-        ->route('/store', 'nodeloc.referral.store.index'),
-
+        ->route('/store', 'nodeloc.referral.store.index')
+        ->route('/signup', 'nodeloc_signup')
+        ->route('/signup/{doorkey}', 'nodeloc_signup_invite'),
     // 后端 添加接口
     (new Extend\Routes('api'))
         ->post('/store/referral', 'nodeloc.store.referral.create', CreateReferralRecordController::class)

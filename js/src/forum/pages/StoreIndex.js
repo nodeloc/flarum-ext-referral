@@ -71,7 +71,7 @@ export default class StoreIndex extends Component {
     };
     const copyToClipboard = (text) => {
       const tempInput = document.createElement('textarea');
-      tempInput.value = 'https://www.nodeloc.com/auth/'+text;
+      tempInput.value = app.forum.attribute('baseUrl') + '/signup/'+text;
       document.body.appendChild(tempInput);
       tempInput.select();
       document.execCommand('copy');

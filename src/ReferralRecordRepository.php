@@ -151,6 +151,7 @@ class ReferralRecordRepository
         // 手动关联 Doorkey 模型
         $doorkey->save();
         $record->doorKey()->associate($doorkey);
+        $actor->save();
         $record->save();
         return $record;
 

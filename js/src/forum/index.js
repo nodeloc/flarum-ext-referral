@@ -33,6 +33,7 @@ app.initializers.add('nodeloc-referral', () => {
         <input className="FormControl" name="fof-doorkey" type="text" placeholder={placeholder} bidi={this.doorkey} disabled={this.loading} />
       </div>
     );
+    fields.add('get-invite-code-text', m('.Form-group', m('.get-invite-code-text Alert', "还没有邀请码 ? ", m('a', { href: 'https://www.nodeloc.com/p/1-guide' }, '点此获取'))));
   });
 
   extend(SignUpModal.prototype, 'submitData', function (data) {

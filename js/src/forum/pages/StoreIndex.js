@@ -95,7 +95,8 @@ export default class StoreIndex extends Component {
               <p>
                 {app.translator.trans('nodeloc-referral.forum.invite_code')}: <span className="copyable">{record.doorkey.key}</span>
               </p>
-              <p> {app.translator.trans('nodeloc-referral.forum.count')}: {record.key_count}</p>
+              <p> {app.translator.trans('nodeloc-referral.forum.count')}: {parseInt(record.key_count) - parseInt(record.actives)}
+              </p>
               <p> {app.translator.trans('nodeloc-referral.forum.cost')}: {record.key_cost} 能量</p>
               <p> {app.translator.trans('nodeloc-referral.forum.actives')}: {record.actives}</p>
               <p> {app.translator.trans('nodeloc-referral.forum.is_expire')}: {record.is_expire? '是' : '否'}</p>

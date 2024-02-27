@@ -38,7 +38,9 @@ app.initializers.add('nodeloc-referral', () => {
 
   extend(SignUpModal.prototype, 'submitData', function (data) {
     const newData = data;
-    newData['fof-doorkey'] = this.doorkey;
+    const doorkeyValue = this.doorkey() !== undefined ? this.doorkey() : $('input[name="fof-doorkey"]').val();
+    console.log(this.doorkey());
+    newData['fof-doorkey'] = doorkeyValue;
     return newData;
   });
 });

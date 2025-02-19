@@ -15,7 +15,9 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Http\UrlGenerator;
 use Illuminate\Mail\Message;
 use Illuminate\Contracts\Events\Dispatcher;
+use Carbon\Carbon;
 
+// 获取当前时间
 class FreeReferralRecordRepository
 {
 
@@ -139,14 +141,15 @@ class FreeReferralRecordRepository
             ->where('key_cost', 0) // 只查询免费的
             ->orderBy('created_at', 'desc')
             ->first();
+        $now = Carbon::now();
 
         // 判断冷却时间是否已过
         if ($lastRecord) {
             $cooldownEndTime = $lastRecord->created_at->addDays($matchedFreeCode['days']);
-            if (now()->lessThan($cooldownEndTime)) {
+            if ($now->lessThan($cooldownEndTime)) {
                 throw new \Illuminate\Http\Exceptions\HttpResponseException(
                     response()->json(['error' => $this->translator->trans('nodeloc-referral.forum.wait_to_claim', [
-                        'hours' => $cooldownEndTime->diffInHours(now())
+                        'hours' => $cooldownEndTime->diffInHours($now)
                     ])], 400)
                 );
             }

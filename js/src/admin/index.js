@@ -1,6 +1,9 @@
 // @ts-ignore
 import app from 'flarum/admin/app';
+import FreeCodeListItem from "../common/models/FreeCodeListItem";
+import FreeListSettingPage from "./FreeListSettingPage";
 app.initializers.add('nodeloc/flarum-ext-referral', () => {
+  app.store.models['freecode-list-items'] = FreeCodeListItem;
   app.extensionData
     .for('nodeloc-referral')
     .registerSetting({
@@ -23,6 +26,12 @@ app.initializers.add('nodeloc/flarum-ext-referral', () => {
       label: app.translator.trans('nodeloc-referral.admin.settings.expires'),
       type: 'number',
     })
+    .registerSetting({
+      setting: 'nodeloc-flarum-ext-referral.key_count',
+      label: app.translator.trans('nodeloc-referral.admin.settings.key_count'),
+      type: 'number',
+    })
+    .registerPage(FreeListSettingPage)
     .registerPermission(
       {
         icon: 'fas fa-money-bill',

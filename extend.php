@@ -13,11 +13,11 @@ namespace Nodeloc\Referral;
 
 use Flarum\Extend;
 use Illuminate\Console\Scheduling\Event;
+use Nodeloc\Referral\Api\Controller\CreateFreeReferralRecordController;
 use Nodeloc\Referral\Api\Controller\CreateReferralRecordController;
-use Nodeloc\Referral\Api\Controller\InviteRegisterController;
 use Nodeloc\Referral\Api\Controller\ListReferralRecordController;
 use Flarum\User\Event\Activated as UserActivated;
-
+use Flarum\User\Event\Registered;
 return [
     (new Extend\Frontend('forum'))
         ->js(__DIR__ . '/js/dist/forum.js')
@@ -37,7 +37,13 @@ return [
     // 后端 添加接口
     (new Extend\Routes('api'))
         ->post('/store/referral', 'nodeloc.store.referral.create', CreateReferralRecordController::class)
-        ->get('/store/referral/show', 'nodeloc.store.referral.show', ListReferralRecordController::class),
+        ->post('/store/free', 'nodeloc.store.referral.createfree', CreateFreeReferralRecordController::class)
+        ->get('/store/referral/show', 'nodeloc.store.referral.show', ListReferralRecordController::class)
+        ->get('/store/referral/last-free-code', 'nodeloc.store.referral.lastFreeCode', Controllers\LastFreeCodeController::class)
+        ->get('/freecode-list', 'freecode-list.index', Controllers\ItemListController::class)
+        ->post('/freecode-list-items', 'freecode-list.create', Controllers\ItemStoreController::class)
+        ->patch('/freecode-list-items/{id:[0-9]+}', 'freecode-list.update', Controllers\ItemUpdateController::class)
+        ->delete('/freecode-items/{id:[0-9]+}', 'freecode-list.delete', Controllers\ItemDeleteController::class),
     (new Extend\Settings())
         ->serializeToForum('invite_code_price', 'nodeloc-flarum-ext-referral.price',)
         ->serializeToForum('invite_code_max_number', 'nodeloc-flarum-ext-referral.max_number',)
@@ -51,6 +57,8 @@ return [
         ->schedule('doorman:expire_invite_code', function (Event $event) {
             $event->daily();
         }),
+    (new Extend\Event())
+        ->listen(Registered::class, Listeners\UserRegisteredListener::class),
     (new Extend\Event())
         ->listen(UserActivated::class, Listeners\RewardUser::class),
 ];

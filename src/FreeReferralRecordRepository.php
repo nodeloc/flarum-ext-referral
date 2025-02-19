@@ -15,9 +15,8 @@ use Flarum\Extension\ExtensionManager;
 use Flarum\Http\UrlGenerator;
 use Illuminate\Mail\Message;
 use Illuminate\Contracts\Events\Dispatcher;
-use Mattoid\MoneyHistory\Event\MoneyHistoryEvent;
 
-class ReferralRecordRepository
+class FreeReferralRecordRepository
 {
 
     /**
@@ -90,24 +89,6 @@ class ReferralRecordRepository
         return ReferralRecord::findOrFail($id);
     }
 
-    /**
-     * 检查购买余额限制
-     *
-     * @param int $money
-     * @return bool
-     * @throws PermissionDeniedException
-     */
-    private function checkBuyMoney(int $money, int $key_count): bool
-    {
-        if($key_count<1 ){
-            throw new PermissionDeniedException('邀请码数量不正确!');
-        }
-        // 试图扣钱
-        if (($money - $this->key_price * $key_count) < 0) {
-            throw new PermissionDeniedException('能量不足!');
-        }
-        return true;
-    }
 
     /**
      * 生成一个 key
@@ -128,45 +109,70 @@ class ReferralRecordRepository
         return strtoupper(base_convert($rand_str, 16, 36));
     }
 
-    /**
-     * 创建邀请码
-     *
-     * @param User $actor 用户对象
-     * @param array $data 请求参数
-     * @return ReferralRecord
-     * @throws ValidationException|PermissionDeniedException
-     * @throws \Exception
-     */
-    public function store(User $actor, array $data): ReferralRecord
+    public function store(User $actor): ReferralRecord
     {
-        $key_count = $data['key_count'];
-        // 检查用户余额是否符合要求
-        $money = $actor->getAttribute('money');
-        if ($money === null || $money <= 0) {
-            throw new PermissionDeniedException('能量不足!');
+        // 获取用户的所有用户组
+        $userGroups = $actor->groups()->get();
+
+        if ($userGroups->isEmpty()) {
+            throw new PermissionDeniedException();
         }
-        $this->checkBuyMoney($money, $key_count);
 
-        // 扣减金额
-        $actor->money -= $this->key_price * $key_count;
-        $source = 'BUY_INVITE';
-        $sourceDesc = '购买邀请码';
+        // 获取用户组中 read_permission 最高的那个
+        $highestPermissionGroup = $userGroups->sortByDesc('read_permission')->first();
 
-        $this->events->dispatch(new MoneyHistoryEvent($actor, -$this->key_price * $key_count, $source, $sourceDesc));
-        // 创建邀请码
+        if (!$highestPermissionGroup) {
+            throw new PermissionDeniedException();
+        }
+
+        // 获取 freecode 配置
+        $freecodeList = FreecodeListItem::query()->get();
+        // 查找对应用户组的 freecode 配置
+        $matchedFreeCode = collect($freecodeList)->firstWhere('group_id', $highestPermissionGroup->id);
+
+        if (!$matchedFreeCode) {
+            throw new PermissionDeniedException(); // 没有权限
+        }
+
+        // **查询 key_cost = 0 的最后一条领取记录**
+        $lastRecord = ReferralRecord::where('user_id', $actor->id)
+            ->where('key_cost', 0) // 只查询免费的
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        // 判断冷却时间是否已过
+        if ($lastRecord) {
+            $cooldownEndTime = $lastRecord->created_at->addDays($matchedFreeCode['days']);
+            if (now()->lessThan($cooldownEndTime)) {
+                throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                    response()->json(['error' => $this->translator->trans('nodeloc-referral.forum.wait_to_claim', [
+                        'hours' => $cooldownEndTime->diffInHours(now())
+                    ])], 400)
+                );
+            }
+        }
+
+        // 获取可生成的邀请码数量
+        $key_count = $matchedFreeCode['amount'];
+
+        // 生成邀请码
         $key = $this->buildKey($actor->id);
-        $doorkey = Doorkey::build($key, $this->defaultGroupId, $key_count, false);
+        $doorkey = Doorkey::build($key, $highestPermissionGroup->id, $key_count, false);
+
         $record = new ReferralRecord([
             'user_id' => $actor->id,
-            'key_cost' => $this->key_price * $key_count,
+            'key_cost' => 0,
             'key_count' => $key_count,
             'is_expire' => 0,
         ]);
-        // 手动关联 Doorkey 模型
+
+        // 关联 Doorkey 并保存
         $doorkey->save();
         $record->doorKey()->associate($doorkey);
-        $actor->save();
         $record->save();
+
         return $record;
     }
+
+
 }

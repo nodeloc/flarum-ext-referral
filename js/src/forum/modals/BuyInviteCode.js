@@ -4,6 +4,7 @@ import Button from 'flarum/common/components/Button';
 import Stream from 'flarum/common/utils/Stream';
 
 export default class BuyInviteCode extends Modal {
+
   constructor() {
     super();
     this.invite_code_price = app.forum.attribute('invite_code_price');
@@ -43,11 +44,9 @@ export default class BuyInviteCode extends Modal {
         return;
       }
 
-      // Clear email and message
       this.key_count('0');
-      // Close the purchase box
       this.hide();
-      m.route.set(m.route.get()); // 刷新当前路由的页面
+      m.route.set(m.route.get());
     });
   }
 

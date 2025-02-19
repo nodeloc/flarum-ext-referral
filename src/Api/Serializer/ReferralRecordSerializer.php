@@ -17,7 +17,7 @@ class ReferralRecordSerializer extends AbstractSerializer
         'doorkeys', // 添加这一行
     ];
 
-    public $optionalInclude = ['doorkeys','doorkeys.key', 'doorkeys.activates'];
+    public $optionalInclude = ['doorkeys','doorkeys.key', 'doorkeys.activates', 'doorkeys.registers'];
     /**
      * {@inheritdoc}
      */
@@ -75,6 +75,7 @@ class ReferralRecordSerializer extends AbstractSerializer
             'key_cost' => $model->key_cost,
             'key_count' => $model->key_count,
             'actives' => $model->actives,
+            'registers' => $model->regisgers,
             'is_expire' => $model->is_expire,
             'created_at' => $this->formatDate($model->created_at),
             'updated_at' => $this->formatDate($model->updated_at),
@@ -105,6 +106,7 @@ class ReferralRecordSerializer extends AbstractSerializer
             'key_cost' => $model->key_cost,
             'key_count' => $model->key_count,
             'actives' => $model->actives,
+            'registers' => $model->registers,
             'is_expire' => $model->is_expire,
             'created_at' => $this->formatDate($model->created_at),
             'updated_at' => $this->formatDate($model->updated_at),

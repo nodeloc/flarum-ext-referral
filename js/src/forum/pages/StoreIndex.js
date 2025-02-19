@@ -3,6 +3,7 @@ import app from 'flarum/forum/app';
 import listItems from 'flarum/common/helpers/listItems';
 import Button from 'flarum/common/components/Button';
 import BuyInviteCode from "../modals/BuyInviteCode";
+import FreeInviteCode from "../modals/FreeInviteCode";
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import Component from 'flarum/common/Component';
 import Alert from 'flarum/common/components/Alert';
@@ -16,19 +17,19 @@ export default class StoreIndex extends Component {
     const invite_code_price = app.forum.attribute("invite_code_price");
     const invite_code_max_number = app.forum.attribute("invite_code_max_number");
     const invite_code_expires = app.forum.attribute("invite_code_expires");
-    // 接口请求
+    this.loadData();
+  }
+  loadData() {
     app.request({
       method: 'GET',
       url: app.forum.attribute('apiUrl') + '/store/referral/show',
     }).then(response => {
-      // 确保 response 包含 data 属性
       if (response.data) {
         this.records = response;
-        m.redraw()
+        m.redraw();
       }
-    }); // 使用 .then 触发重绘
+    });
   }
-
   view() {
     return (
       <div className="IndexPage">
@@ -49,6 +50,16 @@ export default class StoreIndex extends Component {
                       }}
                     >
                       {app.translator.trans('nodeloc-referral.forum.purchase_invite_code')}
+                    </Button>
+
+                    <Button
+                      style="margin-left: 10px;"
+                      class="Button Button--primary"
+                      onclick={() => {
+                        app.modal.show(FreeInviteCode);
+                      }}
+                    >
+                      {app.translator.trans('nodeloc-referral.forum.free_invite_code')}
                     </Button>
                     <div class="StoreIndex-Body">
                       {this.records ? this.recordsContent() :
@@ -79,7 +90,8 @@ export default class StoreIndex extends Component {
       // 显示复制成功的提示消息
       app.alerts.show(Alert, {type: 'success'}, "邀请码已复制到剪贴板");
     };
-    console.log("records:",this.records.data.attributes);
+
+
     if (!this.records.data.attributes || this.records.data.attributes.length === 0) {
       return "";
     }
@@ -88,18 +100,19 @@ export default class StoreIndex extends Component {
         <ul>
           {this.records.data.attributes.map(record => (
             <li key={record.id}
-                className="copyable-item"
-                onclick={() => copyToClipboard(record.doorkey.key)}
+                className={record.is_expire ? 'expired' : 'copyable-item'}
+                onclick={record.doorkey ? () => copyToClipboard(record.doorkey.key) : null}
                 >
               <p> {app.translator.trans('nodeloc-referral.forum.create_time')}: {formatDate(record.created_at)}</p>
               <p>
-                {app.translator.trans('nodeloc-referral.forum.invite_code')}: <span className="copyable">{record.doorkey.key}</span>
+                {app.translator.trans('nodeloc-referral.forum.invite_code')}: <span className={record.is_expire ? 'expired' : 'copyable'}>
+                  {record.doorkey ? (record.doorkey.key ? record.doorkey.key : "已过期") : "已过期"}
+                </span>
               </p>
-              <p> {app.translator.trans('nodeloc-referral.forum.count')}: {parseInt(record.key_count) - parseInt(record.actives)}
-              </p>
+              <p> {app.translator.trans('nodeloc-referral.forum.count')}: {parseInt(record.key_count) - parseInt(record.registers)}</p>
               <p> {app.translator.trans('nodeloc-referral.forum.cost')}: {record.key_cost} 能量</p>
+              <p> {app.translator.trans('nodeloc-referral.forum.registers')}: {record.registers}</p>
               <p> {app.translator.trans('nodeloc-referral.forum.actives')}: {record.actives}</p>
-              <p> {app.translator.trans('nodeloc-referral.forum.is_expire')}: {record.is_expire? '是' : '否'}</p>
             </li>
           ))}
         </ul>

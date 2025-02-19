@@ -24,18 +24,25 @@ div.container.buy-store-layer> div.Form {
       display: block;
       border: @primary-color 1px solid;
       color: @primary-color;
-      .copyable{
-        background-color: @secondary-color;
-        padding: 2px;
-        font-size: 10px;
-        color: #0f0d0a;
-        font-family: sans-serif;
+
+      span.copyable.expired {
+        background-color: #f33 !important;
       }
     }
     li:hover{
       border: @primary-color 1px dashed;
       cursor: pointer;
 
+    }
+    .copyable{
+      background-color: @secondary-color;
+      padding: 2px;
+      font-size: 10px;
+      color: #0f0d0a;
+      font-family: sans-serif;
+    }
+    .expired {
+      border: #f33 1px solid !important;
     }
   }
 }

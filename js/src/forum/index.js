@@ -33,13 +33,25 @@ app.initializers.add('nodeloc-referral', () => {
         <input className="FormControl" name="fof-doorkey" type="text" placeholder={placeholder} bidi={this.doorkey} disabled={this.loading} />
       </div>
     );
-    fields.add('get-invite-code-text', m('.Form-group', m('.get-invite-code-text Alert', "还没有邀请码 ? ", m('a', { href: 'https://www.nodeloc.com/p/1-guide' }, '点此获取'))));
+    const noInviteText = app.translator.trans('nodeloc-referral.forum.sign_up.no_invite_text');
+    const getInviteLinkText = app.translator.trans('nodeloc-referral.forum.sign_up.get_invite_link_text');
+
+    fields.add(
+      'get-invite-code-text',
+      m(
+        '.Form-group',
+        m(
+          '.get-invite-code-text Alert',
+          noInviteText,
+          m('a', { href: '/p/5-get-invite-code' }, getInviteLinkText)
+        )
+      )
+    );
   });
 
   extend(SignUpModal.prototype, 'submitData', function (data) {
     const newData = data;
     const doorkeyValue = this.doorkey() !== undefined ? this.doorkey() : $('input[name="fof-doorkey"]').val();
-    console.log(this.doorkey());
     newData['fof-doorkey'] = doorkeyValue;
     return newData;
   });

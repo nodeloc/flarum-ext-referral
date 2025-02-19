@@ -15,6 +15,7 @@ class ReferralRecord extends AbstractModel
     public $fillable = [
         'key_cost',
         'key_count',
+        'registers',
         'actives',
         'is_expire',
         'user_id',

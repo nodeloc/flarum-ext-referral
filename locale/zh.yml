@@ -7,6 +7,7 @@ nodeloc-referral:
       reward: 奖励
       max_number: 单次限额
       expires: 过期
+      key_count: 新用户赠送几个邀请码
     permissions:
       referral_key: Who can invite
     my_cool_key: My Cool Key
@@ -14,6 +15,7 @@ nodeloc-referral:
   forum:
     referral: 邀请好友
     purchase_invite_code: 购买邀请码
+    free_invite_code: 领取免费邀请码
     purchase_help_tip: 邀请码{invite_code_price}能量/个. 每个受邀用户激活后您都将获取{invite_code_reward}能量.
     purchase_max_tip: 购买数量(单次限额{invite_code_max_number}个)
     purchase_expire_tip: 邀请码将会在{invite_code_expires}天后失效
@@ -21,5 +23,9 @@ nodeloc-referral:
     invite_code: 邀请码
     count: 剩余可用
     cost: 成本
-    actives: 受邀用户
+    registers: 受邀用户数
+    actives: 激活用户数
     is_expire: 已过期？
+    sign_up:
+      no_invite_text: "还没有邀请码 ?"
+      get_invite_link_text: "点此获取"

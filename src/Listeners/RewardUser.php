@@ -63,7 +63,6 @@ class RewardUser
 
         $key_count =  (int)$this->settings->get('nodeloc-flarum-ext-referral.key_count', 3);
         if($key_count>0){
-            // 创建邀请码
             $key = $this->buildKey($actor->id);
             $doorkey = Doorkey::build($key, $this->defaultGroupId, $key_count, false);
             $record = new ReferralRecord([
@@ -72,7 +71,6 @@ class RewardUser
                 'key_count' => $key_count,
                 'is_expire' => 0,
             ]);
-            // 手动关联 Doorkey 模型
             $doorkey->save();
             $record->doorKey()->associate($doorkey);
             $actor->save();
@@ -83,18 +81,14 @@ class RewardUser
     public function handle(UserActivated $event)
     {
         $inviteCode = $event->user->invite_code;
-        // 赠送邀请码
         $this->make_free_key($event->user);
         if($this->reword_money>0){
-            // 使用 invite_code 查找 doorkey
             $doorkey = Doorkey::where('key', $inviteCode)->first();
 
             if ($doorkey) {
-                // 查找关联的 user_id
                 $referrerUserId = ReferralRecord::where('doorkey_id', $doorkey->id)->value('user_id');
 
                 if ($referrerUserId) {
-                    // 更新邀请者的 money 字段
                     $referrerUser = User::find($referrerUserId);
 
                     if ($referrerUser) {
@@ -104,7 +98,6 @@ class RewardUser
                         $sourceDesc = $this->translator->trans("antoinefr-money.forum.history.referral");
                         $this->events->dispatch(new MoneyHistoryEvent($referrerUser, $this->reword_money, $source, $sourceDesc));
                     }
-                    // 更新 ReferralRecord 中的 actives 值
                     ReferralRecord::where('doorkey_id', $doorkey->id)->increment('actives');
                 }
             }

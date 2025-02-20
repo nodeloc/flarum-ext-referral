@@ -13,12 +13,9 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Flarum\Settings\SettingsRepositoryInterface;
 use Illuminate\Support\Arr;
 use Flarum\User\User;
-use Mattoid\MoneyHistory\Event\MoneyHistoryEvent;
-use Flarum\Foundation\ValidationException;
 use Flarum\User\Event\Registered;
 use FoF\Doorman\Doorkey;
 use Nodeloc\Referral\ReferralRecord;
-
 class UserRegisteredListener
 {
     /**
@@ -36,22 +33,15 @@ class UserRegisteredListener
     public function handle(Registered $event)
     {
         $inviteCode = $event->user->invite_code;
-        // 使用 invite_code 查找 doorkey
+        $user = $event->user;
         $doorkey = Doorkey::where('key', $inviteCode)->first();
         if ($doorkey) {
-            // 更新 ReferralRecord 中的 actives 值
             ReferralRecord::where('doorkey_id', $doorkey->id)->increment('registers');
-            // 查找关联的 user_id
             $referrerUserId = ReferralRecord::where('doorkey_id', $doorkey->id)->value('user_id');
-
             if ($referrerUserId) {
-                $referrerUser = User::find($referrerUserId);
-                if ($referrerUser) {
-                    $referrerUser->invite_user_id = $event->user->id;
-                    $referrerUser->save();
-                }
+                $user->invite_user_id = $referrerUserId;
+                $user->save();
             }
         }
-
     }
 }

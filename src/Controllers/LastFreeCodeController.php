@@ -26,13 +26,11 @@ class LastFreeCodeController extends AbstractShowController
             throw new \Flarum\User\Exception\PermissionDeniedException();
         }
 
-        // 获取权限最高的用户组
         $group = $actor->groups()->orderBy('read_permission', 'desc')->first();
         if (!$group) {
-            throw new \Exception("No group found for user.");
+            throw new \Flarum\User\Exception\PermissionDeniedException();
         }
 
-        // 获取最后一个免费邀请码领取记录
         $lastRecord = ReferralRecord::where('user_id', $actor->id)
             ->where('key_cost', 0)
             ->orderBy('created_at', 'desc')

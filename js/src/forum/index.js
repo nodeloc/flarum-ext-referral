@@ -6,11 +6,13 @@ import SignupPage from "./pages/SignupPage";
 export {default as extend} from './extend';
 import SignUpModal from 'flarum/forum/components/SignUpModal';
 import Stream from 'flarum/common/utils/Stream';
+import AddInviterToUser from './AddInviterToUsers'
 // 定义路由
 app.routes['nodeloc_signup'] = { path: '/signup', component: SignupPage };
 app.routes['nodeloc_signup_invite'] = { path: '/signup/:doorkey', component: SignupPage };
 
 app.initializers.add('nodeloc-referral', () => {
+  AddInviterToUser();
 // 扩展路由
   extend(app.routes, 'nodeloc_signup', {
     path: '/signup',

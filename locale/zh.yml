@@ -16,6 +16,7 @@ nodeloc-referral:
 
   forum:
     referral: 邀请好友
+    inviter: 邀请者 {inviter}
     purchase_invite_code: 购买邀请码
     free_invite_code: 领取免费邀请码
     free_help_tip: 您每 {days} 天可以领取 {amount} 个免费邀请码

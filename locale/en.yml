@@ -16,6 +16,7 @@ nodeloc-referral:
 
   forum:
     referral: Referral
+    inviter: Inviter {inviter}
     purchase_invite_code: Purchase Invitation Code
     free_invite_code: Free Invitation Code
     purchase_help_tip: Each invitation code costs {invite_code_price} energy. For every successfully invited user, you will be rewarded with {invite_code_reward} energy.

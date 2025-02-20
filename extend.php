@@ -18,6 +18,9 @@ use Nodeloc\Referral\Api\Controller\CreateReferralRecordController;
 use Nodeloc\Referral\Api\Controller\ListReferralRecordController;
 use Flarum\User\Event\Activated as UserActivated;
 use Flarum\User\Event\Registered;
+use Flarum\User\User;
+use Flarum\Api\Serializer\UserSerializer;
+
 return [
     (new Extend\Frontend('forum'))
         ->js(__DIR__ . '/js/dist/forum.js')
@@ -28,8 +31,14 @@ return [
         ->css(__DIR__ . '/less/admin.less'),
 
     new Extend\Locales(__DIR__ . '/locale'),
-
-    // 前端 添加页面路由
+    (new Extend\ApiSerializer(UserSerializer::class))
+        ->attribute('inviter', function (UserSerializer $serializer, User $user) {
+            if ($user->invite_user_id) {
+                $inviter = User::find($user->invite_user_id);
+                return $inviter ? $inviter->username : null;
+            }
+            return null;
+        }),
     (new Extend\Frontend('forum'))
         ->route('/store', 'nodeloc.referral.store.index')
         ->route('/signup', 'nodeloc_signup')

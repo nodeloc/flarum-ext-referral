@@ -160,7 +160,7 @@ class FreeReferralRecordRepository
 
         // 生成邀请码
         $key = $this->buildKey($actor->id);
-        $doorkey = Doorkey::build($key, $highestPermissionGroup->id, $key_count, false);
+        $doorkey = Doorkey::build($key, $this->defaultGroupId, $key_count, false);
 
         $record = new ReferralRecord([
             'user_id' => $actor->id,
